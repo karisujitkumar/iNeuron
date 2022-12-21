@@ -1,1 +1,83 @@
+-- Assignment 1 --
 
+use warehouse DEMO;
+
+use database DEMO;
+
+CREATE OR REPLACE TABLE SALES_DATA_FINAL
+(
+  order_id varchar(60) primary key,--2. According to assignment Order_id was converted into primary key--
+  order_date date,--1. According to first question Order_date was primary key--
+  ship_date date,
+  ship_mode varchar(40),
+  customer_name varchar(65),
+  segment varchar(60),
+  state varchar(60),
+  country varchar(60),
+  market varchar(60),
+  region varchar(60),
+  product_id varchar(60),
+  category varchar(60),
+  sub_category varchar(60),
+  product_name string,
+  sales number(10,3),
+  quantity int,
+  discount float,
+  profit float,
+  shipping_cost float,
+  order_priority varchar(10),
+  year int
+
+);
+
+desc table SALES_DATA_FINAL;
+
+select * from SALES_DATA_FINAL;
+
+---3.Checked the datatype for both order_date and ship_date while creating and updating table--------
+
+--4.Create a new column called order_extract--
+select order_id,substring(order_id,9,10)
+ from sales_data_final;
+ 
+ alter table sales_data_final
+ add column order_extract varchar(25);
+ 
+ update sales_data_final
+ set order_extract = substring(order_id,9,10);
+ 
+--5.Create a new column called Discount Flag--
+alter table sales_data_final
+ add column discount_flag string;
+ 
+
+UPDATE sales_data_final
+SET discount_flag= case 
+when discount>0 then 'YES'
+else 'NO'
+end;
+
+
+
+--6.Create a new column called process days--
+alter table sales_data_final
+ add column process_days string;
+ 
+ ALTER SESSION SET TIMESTAMP_INPUT_FORMAT = 'YYYY-MM-DD';
+ 
+ update sales_data_final
+ set process_days = datediff('day',order_date,ship_date);
+
+--7.Create a new column called Rating--
+alter table sales_data_final 
+add column rating int;
+
+
+
+UPDATE sales_data_final
+SET rating= case 
+WHEN process_days <=3 THEN '5'
+WHEN process_days >3 and  process_days <=6 THEN '4'
+WHEN process_days >6 and  process_days <=10 THEN '3'
+WHEN process_days >10 THEN '2'
+end;
